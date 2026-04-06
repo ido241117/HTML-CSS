@@ -18,8 +18,8 @@ const MENU_ITEMS = [
 	{ page: 'movie.html', icon: '🎬', label: 'Movie' },
 	{ page: 'youtube.html', icon: '📺', label: 'YouTube Feed' },
 	{ page: 'ytdpl.html', icon: '⬇️', label: 'YouTube DL' },
-	//{ page: 'calendar.html', icon: '📅', label: 'Calendar' },
-	//{ page: 'finance.html', icon: '💸', label: 'Finance' },
+	{ page: 'calendar.html', icon: '📅', label: 'Calendar' },
+	{ page: 'finance.html', icon: '💸', label: 'Finance' },
 	{ page: 'settings.html', icon: '⚙️', label: 'Settings' },
 	{ page: 'Design.html', icon: '⁉️', label: 'Design' }
 ];
