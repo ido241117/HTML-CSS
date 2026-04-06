@@ -1,4 +1,4 @@
-# Project M – Personal Hub
+# Personal Hub
 
 Trang  dashboard cá nhân xây dựng để học lập trình HTML CSS js thuần.
 
