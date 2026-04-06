@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>YouTube Downloader - Project M</title>
+	<link rel="stylesheet" href="common.css">
+	<style>
+		/* Page-specific styles */
+		.main-content {
+			margin-left: 240px; /* Căn lề cho sidebar */
+			width: calc(100% - 240px);
+			max-width: 1200px;
+			padding: 40px;
+			display: flex;
+			flex-direction: column;
+		}
+
+		/* Download section */
+		.download-section { 
+			background: var(--bg-secondary); 
+			padding: 40px; 
+			border-radius: 16px; 
+			max-width: 1200px; 
+			margin: 0; 
+			border: 1px solid var(--border-color); 
+			box-shadow: 0 10px 30px rgba(78, 70, 89, 0.08); 
+			position: relative;
+			overflow: hidden;
+		}
+
+		.download-section::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 6px;
+			background: linear-gradient(90deg, var(--color-brand), var(--color-accent));
+		}
+
+		.download-section h2 { 
+			color: var(--color-text-dark); 
+			font-size: 28px; 
+			margin-bottom: 25px; 
+			text-align: center; 
+		}
+
+		.download-form { 
+			display: flex; 
+			flex-direction: column; 
+			gap: 20px; 
+		}
+
+		.form-group { 
+			display: flex; 
+			flex-direction: column; 
+			gap: 10px; 
+		}
+
+		.form-group label { 
+			color: var(--color-text-dark); 
+			font-weight: 600; 
+			font-size: 15px; 
+		}
+
+		.form-group input, 
+		.form-group select { 
+			padding: 12px 18px; 
+			border: 1px solid var(--color-secondary); 
+			border-radius: 8px; 
+			background: #ffffff; 
+			color: var(--color-text-dark); 
+			font-size: 16px; 
+			transition: all 0.3s ease;
+			outline: none;
+		}
+
+		.form-group input:focus, 
+		.form-group select:focus {
+			border-color: var(--color-brand);
+			box-shadow: 0 0 0 3px rgba(100, 105, 204, 0.15), 0 4px 10px rgba(100, 105, 204, 0.1);
+			transform: translateY(-1px);
+		}
+
+		.form-options { 
+			display: flex; 
+			gap: 25px; 
+			flex-wrap: wrap; 
+		}
+
+		.form-options .form-group { 
+			flex: 1; 
+			min-width: 250px; 
+		}
+
+		/* Radio Buttons - Match Design.html */
+		.radio-group { 
+			display: flex; 
+			gap: 20px; 
+			flex-direction: row; 
+			padding: 5px 0;
+		}
+
+		.radio-container {
+			display: flex;
+			align-items: center;
+			position: relative;
+			padding-left: 30px;
+			cursor: pointer;
+			font-size: 15px;
+			user-select: none;
+			color: var(--color-text-dark);
+		}
+
+		.radio-container input {
+			position: absolute;
+			opacity: 0;
+			cursor: pointer;
+		}
+
+		.checkmark {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 20px;
+			width: 20px;
+			background-color: #eee;
+			border: 2px solid var(--color-secondary);
+			border-radius: 50%;
+			transition: all 0.2s;
+		}
+
+		.radio-container:hover input~.checkmark {
+			background-color: #e2e2e2;
+		}
+
+		.radio-container input:checked~.checkmark {
+			border-color: var(--color-brand);
+			background-color: white;
+		}
+
+		.checkmark:after {
+			content: "";
+			position: absolute;
+			display: none;
+		}
+
+		.radio-container input:checked~.checkmark:after {
+			display: block;
+		}
+
+		.radio-container .checkmark:after {
+			top: 3px;
+			left: 3px;
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			background: var(--color-brand);
+		}
+
+		/* Button styling */
+		.download-btn { 
+			padding: 14px 28px; 
+			background-color: var(--color-accent); 
+			color: var(--color-text-dark); 
+			border: none; 
+			border-radius: 8px; 
+			cursor: pointer; 
+			font-weight: 700; 
+			font-size: 16px; 
+			transition: all 0.2s ease; 
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			margin-top: 10px;
+		}
+
+		.download-btn:hover { 
+			background-color: #e0c590;
+			box-shadow: 0 4px 12px rgba(216, 184, 124, 0.4);
+		}
+
+		.download-btn:active {
+			transform: scale(0.98);
+		}
+
+		.download-btn:disabled { 
+			background: var(--color-secondary); 
+			color: #ffffff;
+			cursor: not-allowed; 
+			box-shadow: none;
+		}
+
+		.status-message { 
+			padding: 15px; 
+			border-radius: 8px; 
+			font-size: 14px; 
+			margin-top: 20px; 
+			text-align: center; 
+			display: none; 
+			font-weight: 500;
+		}
+
+		.status-message.show { display: block; }
+		.status-message.success { background: rgba(21, 87, 36, 0.1); color: #155724; border: 1px solid #c3e6cb; }
+		.status-message.error { background: rgba(114, 28, 36, 0.1); color: #721c24; border: 1px solid #f5c6cb; }
+		.status-message.info { background: rgba(12, 84, 96, 0.1); color: #0c5460; border: 1px solid #bee5eb; }
+		
+		/* Instructions */
+		.instructions { 
+			background: var(--bg-secondary); 
+			padding: 25px; 
+			border-radius: 12px; 
+			max-width: 800px; 
+			margin: 40px auto; 
+			border: 1px solid var(--border-color); 
+			box-shadow: var(--shadow);
+		}
+
+		.instructions h3 { 
+			color: var(--color-text-dark); 
+			font-size: 20px; 
+			margin-bottom: 15px; 
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.instructions ul { 
+			color: var(--color-text-dark); 
+			line-height: 1.8; 
+			opacity: 0.9;
+			padding-left: 20px;
+		}
+	</style>
+</head>
+<body>
+	<!-- Sidebar được load từ sidebar.js -->
+	
+	<!-- Main Content -->
+	<div class="main-content">
+		<header style="margin-bottom: 40px; width: 100%; max-width: 800px; margin-left: 0; margin-right: 0;">
+			<h1>⬇️ YouTube Downloader</h1>
+			<p style="font-size: 1.1em; color: var(--color-text-dark); opacity: 0.8;">
+				Công cụ tải nhạc và video từ YouTube trực tiếp vào hệ thống Project M.
+			</p>
+		</header>
+		
+		<div class="download-section">
+			<h2>Tải nhạc từ YouTube</h2>
+			
+			<form class="download-form" onsubmit="downloadYoutube(event)">
+				<div class="form-group">
+					<label for="ytbLink">Link YouTube</label>
+					<input 
+						id="ytbLink" 
+						type="text" 
+						placeholder="Nhập link YouTube (ví dụ: https://youtube.com/watch?v=...)" 
+						required
+					>
+				</div>
+				
+				<div class="form-options">
+					<div class="form-group">
+						<label>Loại tải:</label>
+						<div class="radio-group">
+							<label class="radio-container">🎵 MP3 (Chỉ âm thanh)
+								<input type="radio" name="downloadType" value="mp3" checked>
+								<span class="checkmark"></span>
+							</label>
+							<label class="radio-container">🎥 Video (MP4)
+								<input type="radio" name="downloadType" value="video">
+								<span class="checkmark"></span>
+							</label>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label for="downloadFolder">Thư mục lưu:</label>
+						<select id="downloadFolder">
+							<option value="RAW">RAW (Nhạc)</option>
+							<option value="dowload">Dowload (File tạm)</option>
+							<option value="picture">Picture (Ảnh/Video)</option>
+							<option value="temp">Z:\Tempfile (Tạm thời)</option>
+						</select>
+					</div>
+				</div>
+				
+				<button type="submit" class="download-btn" id="downloadBtn">
+					⬇️ Tải xuống
+				</button>
+				
+				<div id="statusMessage" class="status-message"></div>
+			</form>
+		</div>
+		
+		<div class="instructions">
+			<h3>📝 Hướng dẫn sử dụng:</h3>
+			<ul>
+				<li>Sao chép link video YouTube bạn muốn tải</li>
+				<li>Dán vào ô "Link YouTube" ở trên</li>
+				<li>Chọn <strong>MP3</strong> (chỉ âm thanh) hoặc <strong>Video</strong> (MP4)</li>
+				<li>Chọn thư mục lưu: <strong>RAW</strong> (nhạc), <strong>Dowload</strong> (file tạm), <strong>Picture</strong> (ảnh/video), hoặc <strong>Z:\Tempfile</strong></li>
+				<li>Nhấn "Tải xuống" và chờ quá trình hoàn tất</li>
+				<li>File sẽ được lưu vào thư mục đã chọn</li>
+			</ul>
+		</div>
+	</div>
+	
+	<script src="sidebar.js"></script>
+	<script>
+		// Create sidebar when DOM loaded
+		document.addEventListener('DOMContentLoaded', () => createSidebar('ytdpl.html'));
+		// API_BASE tự động detect từ hostname hiện tại
+		const API_BASE = `http://${location.hostname}:3001`;
+		
+		// Download YouTube video
+		async function downloadYoutube(event) {
+			event.preventDefault();
+			
+			const url = document.getElementById('ytbLink').value.trim();
+			const downloadType = document.querySelector('input[name="downloadType"]:checked').value;
+			const folder = document.getElementById('downloadFolder').value;
+			const btn = document.getElementById('downloadBtn');
+			const status = document.getElementById('statusMessage');
+			
+			if (!url) {
+				showStatus('Vui lòng nhập link YouTube!', 'error');
+				return;
+			}
+			
+			// Disable button and show loading
+			btn.disabled = true;
+			btn.textContent = '⏳ Đang tải...';
+			showStatus('Đang xử lý... Vui lòng chờ.', 'info');
+			
+			try {
+				const res = await fetch(`${API_BASE}/api/download-youtube`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ url, type: downloadType, folder })
+				});
+				
+				const data = await res.json();
+				
+				if (data.success) {
+					showStatus('✓ ' + data.message + ' Quay lại trang Music để nghe nhạc!', 'success');
+					document.getElementById('ytbLink').value = '';
+					
+					// Tự động rescan nếu tải vào RAW
+					if (folder === 'RAW') {
+						fetch(`${API_BASE}/api/rescan`, { method: 'POST' }).catch(() => {});
+					}
+					
+				} else {
+					showStatus('✗ ' + (data.error || 'Lỗi không xác định'), 'error');
+				}
+			} catch (err) {
+				showStatus('✗ Lỗi kết nối: ' + err.message, 'error');
+			} finally {
+				btn.disabled = false;
+				btn.textContent = '⬇️ Tải xuống';
+			}
+		}
+		
+		function showStatus(message, type) {
+			const status = document.getElementById('statusMessage');
+			status.textContent = message;
+			status.className = 'status-message show ' + type;
+		}
+	</script>
+</body>
+</html>

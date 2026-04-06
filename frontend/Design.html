@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test - Color Palette Verification</title>
+    <!-- Use common styles for base reset and layout structure -->
+    <link rel="stylesheet" href="common.css">
+
+    <style>
+        /* 
+         * PROPOSED COLOR PALETTE
+         * 1. #4e4659 (Dark Purple/Gray) - Text, Contrast Elements
+         * 2. #dbdfef (Light Blue/Gray) - Background
+         * 3. #6469cc (Medium Purple/Blue) - Brand Primary
+         * 4. #c3bbc7 (Light Purple/Gray) - Secondary Backgrounds
+         * 5. #d8b87c (Gold/Tan) - Accent / CTA
+         */
+
+        :root {
+            --color-text-dark: #4e4659;
+            --color-bg-light: #dbdfef;
+            --color-brand: #6469cc;
+            --color-secondary: #c3bbc7;
+            --color-accent: #d8b87c;
+        }
+
+        /* Override body for this test page to show the palette's background */
+        body {
+            background-color: var(--color-bg-light) !important;
+            color: var(--color-text-dark) !important;
+        }
+
+        /* 
+         * Typography test for main content only 
+         * To keep Sidebar consistent with other pages (Arial)
+         */
+        .main-content {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--color-text-dark);
+        }
+
+        /* --- Components --- */
+
+        /* 1. Palette Swatches */
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .swatch-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(78, 70, 89, 0.1);
+            transition: transform 0.2s;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .swatch-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .swatch-color {
+            height: 100px;
+            width: 100%;
+        }
+
+        .swatch-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .swatch-hex {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .swatch-name {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        /* 2. Buttons Section */
+        .component-section {
+            background-color: rgba(255, 255, 255, 0.5);
+            /* Glassy effect */
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Button Variants */
+        .btn {
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Primary CTA - Gold/Tan */
+        .btn-primary {
+            background-color: var(--color-accent);
+            color: var(--color-text-dark);
+        }
+
+        .btn-primary:hover {
+            background-color: #e0c590;
+            /* Slightly lighter/different for hover */
+            box-shadow: 0 4px 12px rgba(216, 184, 124, 0.4);
+        }
+
+        /* Secondary - Brand Blue/Purple */
+        .btn-secondary {
+            background-color: var(--color-brand);
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #565ab0;
+            box-shadow: 0 4px 12px rgba(100, 105, 204, 0.4);
+        }
+
+        /* Ghost / Outline - Dark Text */
+        .btn-ghost {
+            background-color: transparent;
+            border: 2px solid var(--color-text-dark);
+            color: var(--color-text-dark);
+            box-shadow: none;
+        }
+
+        .btn-ghost:hover {
+            background-color: var(--color-text-dark);
+            color: var(--color-bg-light);
+        }
+
+        /* 3. Cards & Content */
+        .card-demo-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            flex: 1;
+            min-width: 280px;
+            box-shadow: 0 10px 30px rgba(78, 70, 89, 0.08);
+            /* Soft shadow using color 1 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--color-brand), var(--color-accent));
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--color-secondary);
+            /* Color 4 */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: var(--color-text-dark);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tag-accent {
+            background-color: rgba(216, 184, 124, 0.2);
+            color: #bfa065;
+            /* Darker version of accent for text readability */
+        }
+
+        .tag-brand {
+            background-color: rgba(100, 105, 204, 0.1);
+            color: var(--color-brand);
+        }
+
+        /* 4. Forms & Inputs */
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-row input,
+        .form-row select {
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--color-secondary);
+            color: var(--color-text-dark);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(78, 70, 89, 0.05);
+            background-clip: padding-box;
+        }
+
+        .form-row input:focus,
+        .form-row select:focus {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px rgba(100, 105, 204, 0.15), 0 4px 10px rgba(100, 105, 204, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-white {
+            background-color: #ffffff;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .select-themed {
+            background-color: var(--color-bg-light);
+            flex: 1;
+            min-width: 200px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234e4659' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        /* 5. Toggles & Selection */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            display: inline-block;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--color-secondary);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background-color: var(--color-brand);
+        }
+
+        .toggle-switch input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Radio Buttons */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-left: 35px;
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+            color: var(--color-text-dark);
+        }
+
+        .radio-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 22px;
+            width: 22px;
+            background-color: #eee;
+            border: 2px solid var(--color-secondary);
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .radio-container:hover input~.checkmark {
+            background-color: #e2e2e2;
+        }
+
+        .radio-container input:checked~.checkmark {
+            border-color: var(--color-brand);
+            background-color: white;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .radio-container input:checked~.checkmark:after {
+            display: block;
+        }
+
+        .radio-container .checkmark:after {
+            top: 4px;
+            left: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--color-brand);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar placeholder (will be injected by sidebar.js) -->
+
+    <div class="main-content">
+        <header style="margin-bottom: 40px;">
+            <h1>Design System Preview</h1>
+            <p style="font-size: 1.1em; color: var(--color-text-dark); opacity: 0.8;">
+                Visual verification for the "Muted & Sophisticated" color palette.
+            </p>
+        </header>
+
+        <!-- COLOR PALETTE SECTION -->
+        <section>
+            <h2>Color Palette</h2>
+            <div class="palette-grid">
+                <!-- Color 1 -->
+                <div class="swatch-card">
+                    <div class="swatch-color" style="background-color: var(--color-text-dark);"></div>
+                    <div class="swatch-info">
+                        <span class="swatch-hex">#4e4659</span>
+                        <span class="swatch-name">Dark Text / Base</span>
+                    </div>
+                </div>
+                <!-- Color 2 -->
+                <div class="swatch-card">
+                    <div class="swatch-color"
+                        style="background-color: var(--color-bg-light); border-bottom: 1px solid #eee;"></div>
+                    <div class="swatch-info">
+                        <span class="swatch-hex">#dbdfef</span>
+                        <span class="swatch-name">Background</span>
+                    </div>
+                </div>
+                <!-- Color 3 -->
+                <div class="swatch-card">
+                    <div class="swatch-color" style="background-color: var(--color-brand);"></div>
+                    <div class="swatch-info">
+                        <span class="swatch-hex">#6469cc</span>
+                        <span class="swatch-name">Primary Brand</span>
+                    </div>
+                </div>
+                <!-- Color 4 -->
+                <div class="swatch-card">
+                    <div class="swatch-color" style="background-color: var(--color-secondary);"></div>
+                    <div class="swatch-info">
+                        <span class="swatch-hex">#c3bbc7</span>
+                        <span class="swatch-name">Secondary</span>
+                    </div>
+                </div>
+                <!-- Color 5 -->
+                <div class="swatch-card">
+                    <div class="swatch-color" style="background-color: var(--color-accent);"></div>
+                    <div class="swatch-info">
+                        <span class="swatch-hex">#d8b87c</span>
+                        <span class="swatch-name">Accent / CTA</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPONENTS SECTION -->
+        <section>
+            <h2>Buttons & Actions</h2>
+            <div class="component-section">
+                <p style="margin-bottom: 20px;">Use these button styles for different levels of hierarchy.</p>
+
+                <div class="button-row">
+                    <!-- Primary -->
+                    <div style="text-align: center;">
+                        <button class="btn btn-primary">Primary Action</button>
+                        <div style="font-size: 0.8em; margin-top: 10px; opacity: 0.7;">Accent Fill</div>
+                    </div>
+
+                    <!-- Secondary -->
+                    <div style="text-align: center;">
+                        <button class="btn btn-secondary">Secondary Action</button>
+                        <div style="font-size: 0.8em; margin-top: 10px; opacity: 0.7;">Brand Fill</div>
+                    </div>
+
+                    <!-- Ghost -->
+                    <div style="text-align: center;">
+                        <button class="btn btn-ghost">Ghost Button</button>
+                        <div style="font-size: 0.8em; margin-top: 10px; opacity: 0.7;">Outline</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORMS SECTION -->
+        <section>
+            <h2>Forms & Inputs</h2>
+            <div class="component-section">
+                <p style="margin-bottom: 20px;">Standardized input and selection components.</p>
+
+                <div class="form-row">
+                    <!-- Input with White Background -->
+                    <input type="text" class="input-white" placeholder="Input với nền trắng (bg-secondary)...">
+
+                    <!-- Select with Themed Background -->
+                    <select class="select-themed">
+                        <option value="">Chọn playlist (nền background)...</option>
+                        <option value="1">Playlist 1</option>
+                        <option value="2">Playlist 2</option>
+                    </select>
+
+                    <button class="btn btn-primary" style="padding: 10px 30px;">Gửi</button>
+                </div>
+
+                <div style="margin-top: 15px; font-size: 0.85em; opacity: 0.7;">
+                    Sử dụng <code>.input-white</code> cho các ô nhập liệu cần sự nổi bật và <code>.select-themed</code> để hòa nhập với màu nền trang <code>#dbdfef</code>.
+                </div>
+            </div>
+        </section>
+
+        <!-- SELECTION SECTION -->
+        <section>
+            <h2>Selection Controls</h2>
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <!-- Toggle Section -->
+                <div class="component-section" style="flex: 1; min-width: 300px;">
+                    <h3>Toggle Switches</h3>
+                    <p style="margin-bottom: 20px; font-size: 0.9em; opacity: 0.8;">Sync with "Phân trang" style from settings.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 8px;">
+                            <span>Chế độ nền tối (Dark Mode)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 8px;">
+                            <span>Thông báo hệ thống</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.3); border-radius: 8px;">
+                            <span>Tự động cập nhật</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Radio Section -->
+                <div class="component-section" style="flex: 1; min-width: 300px;">
+                    <h3>Radio Buttons</h3>
+                    <p style="margin-bottom: 20px; font-size: 0.9em; opacity: 0.8;">Themed selection for single choices.</p>
+                    
+                    <div class="radio-group">
+                        <label class="radio-container">Lựa chọn mặc định
+                            <input type="radio" checked name="radio-demo">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="radio-container">Lựa chọn thứ hai
+                            <input type="radio" name="radio-demo">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="radio-container">Lựa chọn nâng cao
+                            <input type="radio" name="radio-demo">
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LAYOUT SECTION -->
+        <section>
+            <h2>Content Cards</h2>
+            <div class="card-demo-container">
+
+                <!-- Card 1 -->
+                <div class="feature-card">
+                    <span class="tag tag-accent">Featured</span>
+                    <div class="feature-icon">✨</div>
+                    <h3 style="margin-top: 0;">Modern Aesthetics</h3>
+                    <p style="line-height: 1.6; opacity: 0.9;">
+                        The interface uses a subtle color scheme to create a clean, professional look that is easy on
+                        the eyes while maintaining high contrast for readability.
+                    </p>
+                    <button class="btn btn-ghost" style="padding: 8px 20px; font-size: 0.9em;">Learn More</button>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="feature-card">
+                    <span class="tag tag-brand">New Update</span>
+                    <div class="feature-icon">🚀</div>
+                    <h3 style="margin-top: 0;">Performance</h3>
+                    <p style="line-height: 1.6; opacity: 0.9;">
+                        Components are designed to be lightweight and responsive. The card layout adapts to different
+                        screen sizes automatically.
+                    </p>
+                    <button class="btn btn-secondary" style="padding: 8px 20px; font-size: 0.9em;">View Details</button>
+                </div>
+
+            </div>
+        </section>
+
+        <footer
+            style="margin-top: 60px; padding: 20px 0; border-top: 1px solid rgba(78, 70, 89, 0.1); text-align: center; font-size: 0.9em; opacity: 0.6;">
+            Design Prototype - v1.0
+        </footer>
+
+    </div>
+
+    <!-- Inject Sidebar Logic -->
+    <script src="sidebar.js"></script>
+    <script>
+        // Initialize sidebar when DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof createSidebar === 'function') {
+                createSidebar('Design.html');
+            }
+        });
+    </script>
+</body>
+
+</html>

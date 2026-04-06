@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>YouTube Feed - Project M</title>
+	<link rel="stylesheet" href="common.css">
+	<style>
+		/* Page-specific styles */
+		.subtitle {
+			color: var(--text-secondary);
+			margin-top: -10px;
+			margin-bottom: 20px;
+		}
+
+		/* Add channel section */
+		.add-channel-section {
+			background: var(--bg-secondary);
+			padding: 20px;
+			border-radius: 12px;
+			margin-bottom: 30px;
+			border: 1px solid var(--border-color);
+		}
+
+		.add-channel-section h2 {
+			color: var(--text-primary);
+			font-size: 20px;
+			margin-bottom: 15px;
+		}
+
+		.add-channel-form {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+
+		.add-channel-form input {
+			flex: 1;
+			min-width: 300px;
+			padding: 10px;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			font-size: 14px;
+		}
+
+		.add-channel-form button {
+			padding: 10px 20px;
+			background: #28a745;
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: bold;
+		}
+
+		.add-channel-form button:hover {
+			background: #218838;
+		}
+
+		/* Channels Grid (Adapted from Dashboard shortcuts) */
+		.channels-section {
+			margin-bottom: 30px;
+		}
+
+		.channels-section h2 {
+			color: var(--text-primary);
+			font-size: 20px;
+			margin-bottom: 15px;
+		}
+
+		.channels-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+			gap: 20px;
+		}
+
+		.channel-item {
+			background: var(--bg-secondary);
+			padding: 20px;
+			border-radius: 12px;
+			text-align: center;
+			cursor: pointer;
+			transition: all 0.2s;
+			border: 2px solid var(--border-color);
+			position: relative;
+			opacity: 0.7;
+			/* Default unselected state */
+		}
+
+		.channel-item:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+			opacity: 1;
+		}
+
+		.channel-item.selected {
+			border-color: #28a745;
+			opacity: 1;
+			background: rgba(40, 167, 69, 0.1);
+		}
+
+		.channel-icon {
+			width: 64px;
+			height: 64px;
+			border-radius: 50%;
+			object-fit: cover;
+			margin: 0 auto 10px;
+			display: block;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.channel-name {
+			color: var(--text-primary);
+			font-size: 14px;
+			font-weight: 500;
+			word-break: break-word;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			height: 2.8em;
+			/* Force height for alignment */
+		}
+
+		.channel-delete {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			background: #e74c3c;
+			color: #fff;
+			border: none;
+			border-radius: 50%;
+			width: 24px;
+			height: 24px;
+			cursor: pointer;
+			font-size: 12px;
+			display: none;
+			z-index: 10;
+		}
+
+		.channel-item:hover .channel-delete {
+			display: block;
+		}
+
+		.channel-delete:hover {
+			background: #c0392b;
+		}
+
+		.selection-indicator {
+			position: absolute;
+			top: 5px;
+			left: 5px;
+			background: #28a745;
+			color: #fff;
+			border-radius: 50%;
+			width: 24px;
+			height: 24px;
+			font-size: 14px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			transition: opacity 0.2s;
+		}
+
+		.channel-item.selected .selection-indicator {
+			opacity: 1;
+		}
+
+
+		/* Feed controls */
+		.feed-controls {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+			flex-wrap: wrap;
+			gap: 15px;
+		}
+
+		.feed-controls h2 {
+			color: var(--text-primary);
+			font-size: 24px;
+			margin: 0;
+		}
+
+		.refresh-btn {
+			padding: 10px 20px;
+			background: #007acc;
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.refresh-btn:hover {
+			background: #005a9e;
+		}
+
+		.refresh-btn:disabled {
+			background: #6c757d;
+			cursor: not-allowed;
+		}
+
+		/* Videos grid */
+		.videos-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+			gap: 20px;
+		}
+
+		.video-card {
+			background: var(--bg-secondary);
+			border-radius: 12px;
+			overflow: hidden;
+			border: 1px solid var(--border-color);
+			transition: transform 0.2s, box-shadow 0.2s;
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.video-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+		}
+
+		.video-thumbnail {
+			width: 100%;
+			aspect-ratio: 16/9;
+			object-fit: cover;
+			background: var(--bg-primary);
+		}
+
+		.video-duration {
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+			background: rgba(0, 0, 0, 0.8);
+			color: #fff;
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-size: 12px;
+			font-weight: bold;
+		}
+
+		.video-thumbnail-container {
+			position: relative;
+		}
+
+		.video-info {
+			padding: 15px;
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.video-title {
+			color: var(--text-primary);
+			font-size: 16px;
+			font-weight: bold;
+			margin-bottom: 8px;
+			line-height: 1.4;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.video-channel {
+			color: var(--text-secondary);
+			font-size: 14px;
+			margin-bottom: 5px;
+		}
+
+		.video-meta {
+			color: var(--text-secondary);
+			font-size: 12px;
+			margin-top: auto;
+		}
+
+		/* Loading */
+		.loading {
+			text-align: center;
+			padding: 40px;
+			color: var(--text-secondary);
+			font-size: 16px;
+		}
+
+		/* Empty state */
+		.empty-state {
+			text-align: center;
+			padding: 60px 20px;
+			color: var(--text-secondary);
+		}
+
+		.empty-state-icon {
+			font-size: 64px;
+			margin-bottom: 20px;
+		}
+
+		.empty-state h3 {
+			font-size: 24px;
+			margin-bottom: 10px;
+		}
+
+		.empty-state p {
+			font-size: 16px;
+		}
+
+		/* Error message */
+		.error-message {
+			background: #e74c3c;
+			color: #fff;
+			padding: 15px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+		}
+
+		/* Last update info */
+		.last-update {
+			text-align: center;
+			color: var(--text-secondary);
+			font-size: 12px;
+			margin-top: 20px;
+		}
+
+		/* Edit Button on Channel */
+		.channel-edit {
+			position: absolute;
+			top: 5px;
+			left: 5px;
+			background: var(--bg-tertiary, #4a4a4a);
+			color: #fff;
+			border: none;
+			border-radius: 50%;
+			width: 24px;
+			height: 24px;
+			cursor: pointer;
+			font-size: 12px;
+			display: none;
+			z-index: 10;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.channel-item:hover .channel-edit {
+			display: flex;
+		}
+
+		.channel-edit:hover {
+			background: var(--text-secondary);
+		}
+
+		/* Modal Styles */
+		.modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.7);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 1000;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.2s;
+		}
+
+		.modal-overlay.active {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.modal-content {
+			background: var(--bg-secondary);
+			padding: 25px;
+			border-radius: 12px;
+			width: 90%;
+			max-width: 500px;
+			border: 1px solid var(--border-color);
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+		}
+
+		.modal-header {
+			margin-bottom: 20px;
+			border-bottom: 1px solid var(--border-color);
+			padding-bottom: 10px;
+		}
+
+		.modal-title {
+			font-size: 20px;
+			font-weight: bold;
+			color: var(--text-primary);
+			margin: 0;
+		}
+
+		.modal-body {
+			margin-bottom: 25px;
+		}
+
+		.form-group {
+			margin-bottom: 15px;
+		}
+
+		.form-label {
+			display: block;
+			margin-bottom: 8px;
+			color: var(--text-primary);
+			font-weight: 500;
+		}
+
+		.category-input-container {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+
+		.category-input {
+			flex: 1;
+			padding: 8px;
+			border-radius: 6px;
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
+		}
+
+		.add-category-btn {
+			padding: 8px 15px;
+			background: #28a745;
+			color: white;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+		}
+
+		.categories-list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			min-height: 40px;
+			padding: 10px;
+			background: var(--bg-primary);
+			border-radius: 6px;
+			border: 1px solid var(--border-color);
+		}
+
+		.category-chip {
+			background: var(--highlight-color, #007acc);
+			color: white;
+			padding: 4px 10px;
+			border-radius: 16px;
+			font-size: 13px;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.chip-remove {
+			cursor: pointer;
+			font-weight: bold;
+			opacity: 0.7;
+		}
+
+		.chip-remove:hover {
+			opacity: 1;
+		}
+
+		.modal-footer {
+			display: flex;
+			justify-content: flex-end;
+			gap: 10px;
+		}
+
+		.btn-cancel {
+			padding: 8px 20px;
+			background: transparent;
+			border: 1px solid var(--border-color);
+			color: var(--text-primary);
+			border-radius: 6px;
+			cursor: pointer;
+		}
+
+		.btn-save {
+			padding: 8px 20px;
+			background: #007acc;
+			color: white;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+		}
+
+		/* Override selection indicator position */
+		.selection-indicator {
+			left: auto;
+			right: 5px;
+			/* Move selection check to right */
+		}
+
+		/* Move delete button to top left temporarily or adjust? 
+		   Actually, let's keep delete on right and put edit on left.
+		   The previous CSS had delete on right: 5px.
+		   Selection indicator was on left: 5px.
+		   Let's check the previous CSS again.
+		*/
+
+		/* 
+		Original:
+		.channel-delete { top: 5px; right: 5px; }
+		.selection-indicator { top: 5px; left: 5px; }
+		
+		I will put:
+		Edit button: top left (replacing selection indicator's spot, or push selection indicator down?)
+		Let's put Edit button at Top-Left.
+		Selection Indicator at Bottom-Right or Top-Right (colliding with delete).
+		
+		Better layout:
+		Top-Right: Delete (X)
+		Top-Left: Edit (Gear)
+		Center-Overlay or corner badge: Selection Check.
+		
+		Let's adjust:
+		.channel-edit { top: 5px; left: 5px; }
+		.selection-indicator { top: auto; bottom: 5px; right: 5px; left: auto; }
+		*/
+
+		.selection-indicator {
+			top: auto;
+			bottom: 5px;
+			right: 5px;
+			left: auto;
+		}
+
+		.channel-count {
+			font-size: 14px;
+			color: var(--text-secondary);
+			font-weight: normal;
+			margin-left: 10px;
+		}
+
+		/* Header controls for channels */
+		.channels-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 15px;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.category-filter {
+			padding: 8px;
+			border-radius: 6px;
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			min-width: 150px;
+		}
+	</style>
+</head>
+
+<body>
+	<script src="sidebar.js"></script>
+
+	<div class="main-content">
+		<h1>📺 YouTube Feed</h1>
+		<p class="subtitle">Xem video mới nhất từ các kênh yêu thích của bạn</p>
+
+		<!-- Add Channel Section -->
+		<div class="add-channel-section" id="addChannelSection">
+			<h2>➕ Thêm Channel</h2>
+			<div class="add-channel-form">
+				<input type="text" id="channelInput"
+					placeholder="Dán URL channel, video, hoặc nhập Channel ID / @username">
+				<button onclick="addChannel()">Thêm Channel</button>
+			</div>
+		</div>
+
+		<!-- Channels Grid -->
+		<div class="channels-section" id="channelsSection" style="display: none;">
+			<div class="channels-header">
+				<h2>📋 Danh Sách Channels <span id="channelCount" class="channel-count"></span></h2>
+				<select id="categoryFilter" class="category-filter" onchange="handleCategoryChange()">
+					<option value="all">Tất cả danh mục</option>
+					<option value="none">Chưa phân loại</option>
+				</select>
+			</div>
+			<!-- Grid -->
+			<div class="channels-grid" id="channelsGrid"></div>
+		</div>
+
+		<!-- Channel Edit Modal -->
+		<div class="modal-overlay" id="editModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Cài đặt Channel</h3>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label class="form-label">Tên Channel</label>
+						<div id="editChannelName" style="color: var(--text-secondary); font-style: italic;"></div>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Danh mục</label>
+						<div class="category-input-container">
+							<input type="text" id="newCategoryInput" class="category-input"
+								placeholder="Nhập tên danh mục mới..." onkeypress="handleCategoryInput(event)">
+							<button class="add-category-btn" onclick="addCurrentCategory()">Thêm</button>
+						</div>
+						<div class="categories-list" id="modalCategoriesList"></div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn-cancel" onclick="closeEditModal()">Hủy</button>
+					<button class="btn-save" onclick="saveChannelSettings()">Lưu thay đổi</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Feed Controls -->
+		<div class="feed-controls" id="feedControls" style="display: none;">
+			<div
+				style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+				<h2>🎬 Video Mới Nhất</h2>
+				<span id="feedLastUpdate" style="font-size: 13px; color: var(--text-secondary);"></span>
+			</div>
+			<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+				<select id="timeFilter" onchange="renderVideos()"
+					style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;">
+					<option value="all">Tất cả video</option>
+					<option value="1">24 giờ qua</option>
+					<option value="7" selected>7 ngày qua</option>
+					<option value="30">30 ngày qua</option>
+					<option value="90">3 tháng qua</option>
+				</select>
+				<select id="sortOrder" onchange="renderVideos()"
+					style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;">
+					<option value="newest" selected>Mới nhất trước</option>
+					<option value="oldest">Cũ nhất trước</option>
+					<option value="random">Ngẫu nhiên</option>
+				</select>
+				<select id="durationFilter" onchange="renderVideos()"
+					style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;">
+					<option value="all" selected>Mọi thời lượng</option>
+					<option value="no-shorts">Bỏ Shorts (>1 phút)</option>
+					<option value="shorts">Chỉ Shorts (<1 phút)</option>
+					<option value="1-5">1-5 phút</option>
+					<option value="5-20">5-20 phút</option>
+					<option value="20-60">20-60 phút</option>
+					<option value="60+">Trên 60 phút</option>
+				</select>
+				<button class="refresh-btn" onclick="refreshFeed()" id="refreshBtn">
+					<span>🔄</span>
+					<span>Làm Mới (Đã chọn)</span>
+				</button>
+			</div>
+		</div>
+
+		<!-- Error Message -->
+		<div id="errorMessage" class="error-message" style="display: none;"></div>
+
+		<!-- Loading State -->
+		<div id="loading" class="loading" style="display: none;">
+			Đang tải...
+		</div>
+
+		<!-- Videos Grid -->
+		<div class="videos-grid" id="videosGrid"></div>
+
+		<!-- Empty State -->
+		<div id="emptyState" class="empty-state">
+			<div class="empty-state-icon">📺</div>
+			<h3>Chưa có video nào</h3>
+			<p>Thêm channel và chọn chúng để xem video</p>
+		</div>
+
+		<!-- Last Update -->
+		<div class="last-update" id="lastUpdate"></div>
+	</div>
+
+	<script>
+		const API_URL = 'http://localhost:3001/api/youtube';
+		const COLLECTION_NAME = 'main'; // Hardcoded single collection
+		let channels = [];
+		let videos = [];
+		let selectedChannelIds = new Set();
+		let lastUpdate = null;
+
+		// Modal state
+		let currentEditingChannelId = null;
+		let currentEditingCategories = [];
+
+		// Initialize
+		document.addEventListener('DOMContentLoaded', async () => {
+			createSidebar('youtube.html');
+			await ensureCollectionExists();
+			await loadData();
+
+			// Close modal when clicking outside
+			document.getElementById('editModal').addEventListener('click', (e) => {
+				if (e.target.id === 'editModal') {
+					closeEditModal();
+				}
+			});
+		});
+
+		// Ensure 'main' collection exists
+		async function ensureCollectionExists() {
+			try {
+				const response = await fetch(`${API_URL}/collections`);
+				const data = await response.json();
+				const exists = data.collections && data.collections.includes(COLLECTION_NAME);
+
+				if (!exists) {
+					console.log('Creating main collection...');
+					await fetch(`${API_URL}/collections`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ name: COLLECTION_NAME })
+					});
+				}
+			} catch (err) {
+				console.error('Error checking/creating collection:', err);
+			}
+		}
+
+		// Load data (channels and feed)
+		async function loadData() {
+			showLoading(true);
+			try {
+				await Promise.all([loadChannels(), loadFeed()]);
+
+				// Removed default "select all" logic per user request.
+				// Initial state: No channels selected.
+
+				renderChannels();
+				renderVideos();
+			} catch (err) {
+				console.error('Error loading data:', err);
+				showError('Không thể tải dữ liệu.');
+			} finally {
+				showLoading(false);
+			}
+		}
+
+		// Load channels list
+		async function loadChannels() {
+			try {
+				const response = await fetch(`${API_URL}/collections/${COLLECTION_NAME}/channels`);
+				const data = await response.json();
+				channels = data.channels || [];
+
+				const channelsSection = document.getElementById('channelsSection');
+				if (channels.length > 0) {
+					channelsSection.style.display = 'block';
+					document.getElementById('feedControls').style.display = 'flex';
+					updateCategoryFilter();
+				} else {
+					channelsSection.style.display = 'none';
+					document.getElementById('feedControls').style.display = 'none';
+				}
+			} catch (err) {
+				console.error('Error loading channels:', err);
+			}
+		}
+
+		// Update Category Filter Dropdown
+		function updateCategoryFilter() {
+			const filter = document.getElementById('categoryFilter');
+			const currentValue = filter.value;
+			const uniqueCategories = new Set();
+
+			channels.forEach(c => {
+				if (c.categories && Array.isArray(c.categories)) {
+					c.categories.forEach(cat => uniqueCategories.add(cat));
+				}
+			});
+
+			// Save existing options to preserve order/selection if needed, but here we rebuild
+			filter.innerHTML = `
+				<option value="all">Tất cả danh mục</option>
+				<option value="none">Chưa phân loại</option>
+			`;
+
+			Array.from(uniqueCategories).sort().forEach(cat => {
+				const option = document.createElement('option');
+				option.value = cat;
+				option.textContent = cat;
+				filter.appendChild(option);
+			});
+
+			// Restore selection if it still exists
+			if (currentValue && (currentValue === 'all' || currentValue === 'none' || uniqueCategories.has(currentValue))) {
+				filter.value = currentValue;
+			} else {
+				filter.value = 'all';
+			}
+		}
+
+		// Load feed
+		async function loadFeed() {
+			try {
+				const response = await fetch(`${API_URL}/collections/${COLLECTION_NAME}/feed`);
+				const data = await response.json();
+				videos = data.videos || [];
+				lastUpdate = data.lastUpdate;
+				updateLastTime();
+			} catch (err) {
+				console.error('Error loading feed:', err);
+			}
+		}
+
+		// Handle Category Change
+		function handleCategoryChange() {
+			const categoryFilter = document.getElementById('categoryFilter').value;
+
+			// Clear current selection
+			selectedChannelIds.clear();
+
+			if (categoryFilter === 'all') {
+				// Select ALL channels
+				channels.forEach(c => selectedChannelIds.add(c.id));
+			} else if (categoryFilter === 'none') {
+				// Select channels with NO category
+				channels.forEach(c => {
+					if (!c.categories || c.categories.length === 0) {
+						selectedChannelIds.add(c.id);
+					}
+				});
+			} else {
+				// Select channels in this SPECIFIC category
+				channels.forEach(c => {
+					if (c.categories && c.categories.includes(categoryFilter)) {
+						selectedChannelIds.add(c.id);
+					}
+				});
+			}
+
+			renderChannels(); // Re-render grid to show selection
+			renderVideos();   // Update video feed
+		}
+
+		// Render channels grid
+		function renderChannels() {
+			const grid = document.getElementById('channelsGrid');
+			grid.innerHTML = '';
+
+			const categoryFilter = document.getElementById('categoryFilter').value;
+
+			const filteredChannels = channels.filter(channel => {
+				if (categoryFilter === 'all') return true;
+				if (categoryFilter === 'none') {
+					return !channel.categories || channel.categories.length === 0;
+				}
+				return channel.categories && channel.categories.includes(categoryFilter);
+			});
+
+			filteredChannels.forEach(channel => {
+				const isSelected = selectedChannelIds.has(channel.id);
+				const item = document.createElement('div');
+				item.className = `channel-item ${isSelected ? 'selected' : ''}`;
+				item.onclick = () => toggleChannelSelection(channel.id);
+
+				const categoriesHtml = (channel.categories || []).map(c =>
+					`<span style="font-size: 10px; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; margin: 1px;">${escapeHtml(c)}</span>`
+				).join('');
+
+				item.innerHTML = `
+					<div class="selection-indicator">✓</div>
+					<button class="channel-edit" onclick="event.stopPropagation(); openChannelSettings('${channel.id}')" title="Cài đặt Channel">✎</button>
+					<button class="channel-delete" onclick="event.stopPropagation(); removeChannel('${channel.id}')" title="Xóa channel">×</button>
+					<img class="channel-icon" src="${channel.thumbnail}" alt="${channel.name}" onerror="this.src='common/default-channel.png'">
+					<div class="channel-name">${escapeHtml(channel.name)}</div>
+					<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: 5px;">${categoriesHtml}</div>
+				`;
+				grid.appendChild(item);
+			});
+
+			// Update channel count stats
+			const countEl = document.getElementById('channelCount');
+			if (countEl) {
+				countEl.textContent = `(${selectedChannelIds.size}/${channels.length})`;
+			}
+		}
+
+		// Toggle channel selection
+		function toggleChannelSelection(channelId) {
+			if (selectedChannelIds.has(channelId)) {
+				selectedChannelIds.delete(channelId);
+			} else {
+				selectedChannelIds.add(channelId);
+			}
+			renderChannels(); // Re-render to update UI state
+			renderVideos(); // Re-render videos based on new selection
+		}
+
+		// --- Modal & Category Logic ---
+
+		function openChannelSettings(channelId) {
+			const channel = channels.find(c => c.id === channelId);
+			if (!channel) return;
+
+			currentEditingChannelId = channelId;
+			currentEditingCategories = channel.categories ? [...channel.categories] : [];
+
+			document.getElementById('editChannelName').textContent = channel.name;
+			document.getElementById('newCategoryInput').value = '';
+			renderModalCategories();
+
+			// Show modal
+			document.getElementById('editModal').classList.add('active');
+			document.getElementById('newCategoryInput').focus();
+		}
+
+		function closeEditModal() {
+			document.getElementById('editModal').classList.remove('active');
+			currentEditingChannelId = null;
+			currentEditingCategories = [];
+		}
+
+		function renderModalCategories() {
+			const list = document.getElementById('modalCategoriesList');
+			list.innerHTML = '';
+			currentEditingCategories.forEach((cat, index) => {
+				const chip = document.createElement('div');
+				chip.className = 'category-chip';
+				chip.innerHTML = `
+					${escapeHtml(cat)}
+					<span class="chip-remove" onclick="removeCategory(${index})">×</span>
+				`;
+				list.appendChild(chip);
+			});
+		}
+
+		function addCurrentCategory() {
+			const input = document.getElementById('newCategoryInput');
+			const val = input.value.trim();
+			if (!val) return;
+
+			if (!currentEditingCategories.includes(val)) {
+				currentEditingCategories.push(val);
+				renderModalCategories();
+			}
+			input.value = '';
+			input.focus();
+		}
+
+		function removeCategory(index) {
+			currentEditingCategories.splice(index, 1);
+			renderModalCategories();
+		}
+
+		function handleCategoryInput(event) {
+			if (event.key === 'Enter') {
+				addCurrentCategory();
+			}
+		}
+
+		async function saveChannelSettings() {
+			if (!currentEditingChannelId) return;
+
+			const btn = document.querySelector('.btn-save');
+			const originalText = btn.textContent;
+			btn.disabled = true;
+			btn.textContent = 'Đang lưu...';
+
+			try {
+				const response = await fetch(`${API_URL}/collections/${COLLECTION_NAME}/channels/${currentEditingChannelId}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						categories: currentEditingCategories
+					})
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					// Update local data
+					const channel = channels.find(c => c.id === currentEditingChannelId);
+					if (channel) {
+						channel.categories = data.channel.categories;
+					}
+
+					closeEditModal();
+					updateCategoryFilter(); // Dropdown might need update if new category added
+					renderChannels(); // Channels grid update
+				} else {
+					alert('Lỗi khi lưu cái đặt.');
+				}
+			} catch (err) {
+				console.error('Error saving settings:', err);
+				alert('Lỗi mạng khi lưu cài đặt.');
+			} finally {
+				btn.disabled = false;
+				btn.textContent = originalText;
+			}
+		}
+
+		// -----------------------------
+
+		// Render videos grid
+		function renderVideos() {
+			const grid = document.getElementById('videosGrid');
+			const emptyState = document.getElementById('emptyState');
+			const timeFilter = document.getElementById('timeFilter').value;
+			const durationFilter = document.getElementById('durationFilter').value;
+			const sortOrder = document.getElementById('sortOrder').value;
+
+			// 1. Filter by selected channels
+			let filtered = videos.filter(v => selectedChannelIds.has(v.channelId));
+
+			// 2. Filter by time
+			if (timeFilter !== 'all') {
+				const now = new Date();
+				const ms = parseInt(timeFilter) * 24 * 60 * 60 * 1000;
+				filtered = filtered.filter(v => (now - new Date(v.publishedAt)) <= ms);
+			}
+
+			// 3. Filter by duration
+			if (durationFilter !== 'all') {
+				filtered = filtered.filter(v => {
+					const d = v.duration; // seconds
+					switch (durationFilter) {
+						case 'no-shorts': return d >= 60;
+						case 'shorts': return d < 60;
+						case '1-5': return d >= 60 && d <= 300;
+						case '5-20': return d > 300 && d <= 1200;
+						case '20-60': return d > 1200 && d <= 3600;
+						case '60+': return d > 3600;
+						default: return true;
+					}
+				});
+			}
+
+			// 4. Sort
+			if (sortOrder === 'random') {
+				filtered.sort(() => Math.random() - 0.5);
+			} else if (sortOrder === 'oldest') {
+				filtered.sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt));
+			} else {
+				// Newest
+				filtered.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+			}
+
+			if (filtered.length === 0) {
+				grid.innerHTML = '';
+				emptyState.style.display = 'block';
+				if (channels.length > 0 && selectedChannelIds.size > 0) {
+					emptyState.innerHTML = `
+						<div class="empty-state-icon">📭</div>
+						<h3>Không tìm thấy video</h3>
+						<p>Thử điểu chỉnh bộ lọc hoặc làm mới feed</p>
+					`;
+				} else if (channels.length > 0 && selectedChannelIds.size === 0) {
+					emptyState.innerHTML = `
+						<div class="empty-state-icon">👆</div>
+						<h3>Chưa chọn channel nào</h3>
+						<p>Click vào các channel ở trên để xem video</p>
+					`;
+				} else {
+					emptyState.innerHTML = `
+						<div class="empty-state-icon">📺</div>
+						<h3>Chưa có channel nào</h3>
+						<p>Thêm channel mới để bắt đầu</p>
+					`;
+				}
+				return;
+			}
+
+			emptyState.style.display = 'none';
+			grid.innerHTML = filtered.map(video => `
+				<div class="video-card" onclick="window.open('https://www.youtube.com/watch?v=${video.videoId}', '_blank')">
+					<div class="video-thumbnail-container">
+						<img class="video-thumbnail" src="${video.thumbnail}" alt="${escapeHtml(video.title)}" loading="lazy">
+						${video.duration ? `<div class="video-duration">${formatDuration(video.duration)}</div>` : ''}
+					</div>
+					<div class="video-info">
+						<div class="video-title" title="${escapeHtml(video.title)}">${escapeHtml(video.title)}</div>
+						<div class="video-channel">${escapeHtml(video.channelTitle)}</div>
+						<div class="video-meta">
+							${formatDate(video.publishedAt)}
+						</div>
+					</div>
+				</div>
+			`).join('');
+		}
+
+		// Refresh feed
+		async function refreshFeed() {
+			if (selectedChannelIds.size === 0) {
+				alert('Vui lòng chọn ít nhất một channel để làm mới!');
+				return;
+			}
+
+			const btn = document.getElementById('refreshBtn');
+			btn.disabled = true;
+			btn.innerHTML = '<span>⏳</span><span>Đang tải...</span>';
+			showLoading(true);
+
+			try {
+				const response = await fetch(`${API_URL}/collections/${COLLECTION_NAME}/refresh`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						channelIds: Array.from(selectedChannelIds)
+					})
+				});
+
+				const data = await response.json();
+				videos = data.videos || [];
+				lastUpdate = data.lastUpdate;
+				updateLastTime();
+				renderVideos();
+			} catch (err) {
+				console.error('Error refreshing feed:', err);
+				showError('Lỗi khi làm mới feed. Vui lòng thử lại.');
+			} finally {
+				btn.disabled = false;
+				btn.innerHTML = '<span>🔄</span><span>Làm Mới (Đã chọn)</span>';
+				showLoading(false);
+			}
+		}
+
+		// Add channel
+		async function addChannel() {
+			const input = document.getElementById('channelInput');
+			const value = input.value.trim();
+
+			if (!value) return;
+
+			// Simple heuristic to support YouTube URLs
+			let body = {};
+			if (value.includes('youtube.com/watch?v=')) {
+				const videoId = value.split('v=')[1].split('&')[0];
+				body = { videoId };
+			} else if (value.includes('youtube.com/channel/')) {
+				const channelId = value.split('channel/')[1].split('/')[0];
+				body = { channelId };
+			} else if (value.startsWith('UC') && value.length === 24) {
+				body = { channelId: value };
+			} else {
+				body = { customUrl: value };
+			}
+
+			try {
+				const response = await fetch(`${API_URL}/collections/${COLLECTION_NAME}/channels`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(body)
+				});
+
+				const data = await response.json();
+				if (data.error) {
+					alert('Lỗi: ' + data.error);
+				} else {
+					input.value = '';
+					await loadChannels();
+					// Select the new channel automatically
+					if (data.channel && data.channel.id) {
+						selectedChannelIds.add(data.channel.id);
+						renderChannels();
+					}
+					// Ask if user wants to refresh immediately? optional.
+					// For now just show empty.
+					renderVideos();
+				}
+			} catch (err) {
+				console.error('Error adding channel:', err);
+				alert('Lỗi kết nối!');
+			}
+		}
+
+		// Remove channel
+		async function removeChannel(channelId) {
+			if (!confirm('Bạn có chắc muốn xóa channel này?')) return;
+
+			try {
+				const response = await fetch(`${API_URL}/collections/${COLLECTION_NAME}/channels/${channelId}`, {
+					method: 'DELETE'
+				});
+
+				if (response.ok) {
+					selectedChannelIds.delete(channelId);
+					await loadChannels();
+					renderChannels();
+					renderVideos();
+				} else {
+					alert('Không thể xóa channel.');
+				}
+			} catch (err) {
+				console.error('Error deleting channel:', err);
+			}
+		}
+
+		// Utilities
+		function showLoading(show) {
+			document.getElementById('loading').style.display = show ? 'block' : 'none';
+			document.getElementById('videosGrid').style.display = show ? 'none' : 'grid';
+		}
+
+		function showError(msg) {
+			const el = document.getElementById('errorMessage');
+			el.textContent = msg;
+			el.style.display = 'block';
+			setTimeout(() => el.style.display = 'none', 5000);
+		}
+
+		function escapeHtml(text) {
+			if (!text) return '';
+			return text
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;")
+				.replace(/'/g, "&#039;");
+		}
+
+		function formatDuration(seconds) {
+			const h = Math.floor(seconds / 3600);
+			const m = Math.floor((seconds % 3600) / 60);
+			const s = seconds % 60;
+			if (h > 0) {
+				return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+			}
+			return `${m}:${s.toString().padStart(2, '0')}`;
+		}
+
+		function formatDate(isoString) {
+			if (!isoString) return '';
+			const date = new Date(isoString);
+			const now = new Date();
+			const diff = (now - date) / 1000; // seconds
+
+			if (diff < 60) return 'Vừa xong';
+			if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+			if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+			if (diff < 2592000) return `${Math.floor(diff / 86400)} ngày trước`;
+
+			return date.toLocaleDateString('vi-VN');
+		}
+
+		function updateLastTime() {
+			const el = document.getElementById('lastUpdate');
+			const feedEl = document.getElementById('feedLastUpdate');
+
+			let text = '';
+			if (lastUpdate) {
+				const date = new Date(lastUpdate);
+				text = 'Cập nhật: ' + date.toLocaleString('vi-VN');
+			}
+
+			if (el) el.textContent = text;
+			if (feedEl) feedEl.textContent = text;
+		}
+
+	</script>
+</body>
+
+</html>

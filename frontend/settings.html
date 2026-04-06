@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>Settings - Project M</title>
+	<link rel="stylesheet" href="common.css">
+	<style>
+		/* Settings section */
+		.settings-section {
+			background: #fff;
+			padding: 24px;
+			border-radius: 12px;
+			margin-bottom: 20px;
+			border: 1px solid var(--border-color);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		}
+
+		.settings-section h2 {
+			color: var(--text-dark);
+			font-size: 18px;
+			margin-bottom: 20px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.setting-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 16px 0;
+			border-bottom: 1px solid #f0f0f0;
+		}
+
+		.path-item {
+			background: var(--bg-primary);
+			border: 1px solid var(--border-color);
+			border-radius: 8px;
+			padding: 15px;
+			margin-bottom: 12px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.path-info {
+			flex: 1;
+		}
+
+		.path-label {
+			font-weight: 600;
+			font-size: 14px;
+			color: var(--text-dark);
+			margin-bottom: 4px;
+		}
+
+		.path-value {
+			font-family: 'Consolas', monospace;
+			font-size: 13px;
+			color: #666;
+		}
+
+		.btn-open {
+			padding: 8px 16px;
+			background: var(--color-brand);
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 500;
+			transition: background 0.2s;
+		}
+
+		.btn-open:hover {
+			background: #5359b3;
+		}
+
+		.btn-action {
+			padding: 10px 20px;
+			background: #2ecc71;
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: 600;
+			font-size: 14px;
+		}
+
+		.btn-action:hover {
+			background: #27ae60;
+		}
+
+		/* Toggle switch */
+		.toggle-switch {
+			position: relative;
+			width: 60px;
+			height: 30px;
+		}
+
+		.toggle-switch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.toggle-slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: #ccc;
+			transition: 0.3s;
+			border-radius: 30px;
+		}
+
+		.toggle-slider:before {
+			position: absolute;
+			content: "";
+			height: 22px;
+			width: 22px;
+			left: 4px;
+			bottom: 4px;
+			background: white;
+			transition: 0.3s;
+			border-radius: 50%;
+		}
+
+		.toggle-switch input:checked+.toggle-slider {
+			background: var(--color-brand);
+		}
+
+		.toggle-switch input:checked+.toggle-slider:before {
+			transform: translateX(30px);
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Sidebar được load từ sidebar.js -->
+
+	<!-- Main Content -->
+	<div class="main-content">
+		<h1>⚙️ Settings</h1>
+
+		<!-- System Folders -->
+		<div class="settings-section">
+			<h2>📁 Thư mục hệ thống</h2>
+			
+			<div class="path-item">
+				<div class="path-info">
+					<div class="path-label">🎵 Music Library (RAW)</div>
+					<div class="path-value">D:\Project M\RAW</div>
+				</div>
+				<button class="btn-open" onclick="openPath('D:\\Project M\\RAW')">Mở thư mục</button>
+			</div>
+
+			<div class="path-item">
+				<div class="path-info">
+					<div class="path-label">📚 Book Collection</div>
+					<div class="path-value">D:\Project M\book</div>
+				</div>
+				<button class="btn-open" onclick="openPath('D:\\Project M\\book')">Mở thư mục</button>
+			</div>
+
+			<div class="path-item">
+				<div class="path-info">
+					<div class="path-label">📝 Journal & Writing</div>
+					<div class="path-value">D:\Project M\Write</div>
+				</div>
+				<button class="btn-open" onclick="openPath('D:\\Project M\\Write')">Mở thư mục</button>
+			</div>
+
+			<div class="path-item">
+				<div class="path-info">
+					<div class="path-label">🖼️ Photos & Pictures</div>
+					<div class="path-value">D:\Project M\picture</div>
+				</div>
+				<button class="btn-open" onclick="openPath('D:\\Project M\\picture')">Mở thư mục</button>
+			</div>
+
+			<div class="path-item">
+				<div class="path-info">
+					<div class="path-label">📥 Downloads</div>
+					<div class="path-value">D:\Project M\dowload</div>
+				</div>
+				<button class="btn-open" onclick="openPath('D:\\Project M\\dowload')">Mở thư mục</button>
+			</div>
+		</div>
+
+		<!-- System Actions -->
+		<div class="settings-section">
+			<h2>⚡ Thao tác hệ thống</h2>
+			<div class="setting-item">
+				<div class="setting-label">
+					<div class="setting-label-title">Quét lại thư viện nhạc</div>
+					<div class="setting-label-desc">Đồng bộ file mới từ thư mục RAW vào cơ sở dữ liệu</div>
+				</div>
+				<button class="btn-action" onclick="rescanMusic()">Scan Now</button>
+			</div>
+		</div>
+
+		<div class="settings-section">
+			<h2>🎧 Tùy chọn nghe nhạc</h2>
+
+			<div class="setting-item">
+				<div class="setting-label">
+					<div class="setting-label-title">Phân trang (Pagination)</div>
+					<div class="setting-label-desc">Tải 20 bài mỗi trang thay vì tải tất cả</div>
+				</div>
+				<label class="toggle-switch">
+					<input type="checkbox" id="paginationToggle" onchange="togglePagination()">
+					<span class="toggle-slider"></span>
+				</label>
+			</div>
+		</div>
+
+		<div class="settings-section">
+			<h2>🌐 Network Information</h2>
+
+			<div class="setting-item">
+				<div class="setting-label">
+					<div class="setting-label-title">Địa chỉ truy cập từ điện thoại</div>
+					<div class="setting-label-desc">Sử dụng địa chỉ LAN dưới đây để truy cập từ điện thoại trong cùng
+						WiFi</div>
+				</div>
+			</div>
+
+			<div id="networkInfo" style="margin-top: 15px;">
+				<div
+					style="padding: 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+					<div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px;">Đang tải thông tin
+						mạng...</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="sidebar.js"></script>
+	<script>
+		// Create sidebar when DOM loaded
+		document.addEventListener('DOMContentLoaded', () => createSidebar('settings.html'));
+		// API_BASE tự động detect từ hostname hiện tại
+		const API_BASE = `http://${location.hostname}:3001`;
+
+		// Open Local Path
+		async function openPath(path) {
+			try {
+				const res = await fetch(`${API_BASE}/api/open-local`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ path: path })
+				});
+				const data = await res.json();
+				if (!data.success) {
+					alert('Lỗi: ' + (data.error || 'Không thể mở thư mục'));
+				}
+			} catch (err) {
+				console.error('Error opening path:', err);
+				alert('Lỗi kết nối server');
+			}
+		}
+
+		// Rescan Music
+		async function rescanMusic() {
+			if (!confirm('Bắt đầu quét lại thư viện nhạc?')) return;
+			
+			const btn = event.target;
+			const oldText = btn.textContent;
+			btn.disabled = true;
+			btn.textContent = 'Scanning...';
+			
+			try {
+				const res = await fetch(`${API_BASE}/api/rescan`, { method: 'POST' });
+				const data = await res.json();
+				alert(data.message || 'Đã quét xong!');
+			} catch (err) {
+				console.error('Rescan error:', err);
+				alert('Lỗi khi quét: ' + err.message);
+			} finally {
+				btn.disabled = false;
+				btn.textContent = oldText;
+			}
+		}
+
+		// Pagination toggle
+		function togglePagination() {
+			const isPagination = document.getElementById('paginationToggle').checked;
+			localStorage.setItem('paginationMode', isPagination);
+		}
+
+
+		// Load network info
+		async function loadNetworkInfo() {
+			try {
+				const res = await fetch(`${API_BASE}/api/network-info`);
+				const data = await res.json();
+
+				let html = '';
+
+				// Hiển thị Local URL
+				html += `
+					<div style="padding: 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+						<div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px;">💻 Truy cập từ máy tính (Localhost):</div>
+						<div style="display: flex; align-items: center; gap: 10px;">
+							<code style="flex: 1; padding: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; color: var(--text-primary);">${data.localUrl}/code/frontend/music.html</code>
+							<button onclick="copyToClipboard('${data.localUrl}/code/frontend/music.html')" style="padding: 8px 12px; background: var(--color-brand); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">📋 Copy</button>
+						</div>
+					</div>
+				`;
+
+				// Hiển thị LAN URLs
+				if (data.ipAddresses && data.ipAddresses.length > 0) {
+					data.ipAddresses.forEach((ip, music) => {
+						const lanUrl = `http://${ip.address}:${data.port}/code/frontend/music.html`;
+						html += `
+							<div style="padding: 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+								<div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px;">📱 Truy cập từ điện thoại (${ip.interface}):</div>
+								<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+									<code style="flex: 1; padding: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; color: var(--text-primary);">${lanUrl}</code>
+									<button onclick="copyToClipboard('${lanUrl}')" style="padding: 8px 12px; background: var(--color-brand); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">📋 Copy</button>
+								</div>
+								<div style="font-size: 12px; color: var(--text-secondary);">IP: <strong>${ip.address}</strong></div>
+							</div>
+						`;
+					});
+				}
+
+				// Hiển thị hostname và platform
+				html += `
+					<div style="padding: 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border-color);">
+						<div style="font-size: 12px; color: var(--text-secondary);">Hostname: <strong>${data.hostname}</strong></div>
+						<div style="font-size: 12px; color: var(--text-secondary);">Platform: <strong>${data.platform}</strong></div>
+						<div style="font-size: 12px; color: var(--text-secondary);">Port: <strong>${data.port}</strong></div>
+					</div>
+				`;
+
+				document.getElementById('networkInfo').innerHTML = html;
+			} catch (err) {
+				console.error('Error loading network info:', err);
+				document.getElementById('networkInfo').innerHTML = `
+					<div style="padding: 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border-color); color: #e74c3c;">
+						❌ Không thể tải thông tin mạng: ${err.message}
+					</div>
+				`;
+			}
+		}
+
+		// Copy to clipboard function
+		function copyToClipboard(text) {
+			navigator.clipboard.writeText(text).then(() => {
+				alert('✅ Đã copy vào clipboard!');
+			}).catch(err => {
+				console.error('Copy failed:', err);
+				alert('❌ Copy thất bại!');
+			});
+		}
+
+		// Load pagination preference (mặc định BẬT)
+		const paginationMode = localStorage.getItem('paginationMode');
+		if (paginationMode === null || paginationMode === 'true') {
+			document.getElementById('paginationToggle').checked = true;
+			if (paginationMode === null) localStorage.setItem('paginationMode', 'true');
+		}
+
+		// Load network info
+		loadNetworkInfo();
+	</script>
+</body>
+
+</html>

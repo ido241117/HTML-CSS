@@ -1,0 +1,151 @@
+/*
+#DDF4FF 
+#B6E3FF 
+#80CCFF 
+#54AEFF 
+#218BFF
+#0969DA 
+#0550AE 
+#033D8B 
+#0A3069 
+#002155
+*/
+
+/* CSS Variables - Muted & Sophisticated Theme */
+:root {
+	/* New Color Palette */
+	--color-text-dark: #4e4659;
+	/* Dark Purple/Gray - Text, Contrast */
+	--color-bg-light: #dbdfef;
+	/* Light Blue/Gray - Background */
+	--color-brand: #6469cc;
+	/* Medium Purple/Blue - Brand Primary */
+	--color-secondary: #c3bbc7;
+	/* Light Purple/Gray - Secondary Backgrounds */
+	--color-accent: #d8b87c;
+	/* Gold/Tan - Accent / CTA */
+
+	/* Background colors */
+	--bg-primary: #dbdfef;
+	--bg-secondary: #ffffff;
+
+	/* Text colors */
+	--text-primary: #4e4659;
+	--text-secondary: #666666;
+
+	/* Border and shadows */
+	--border-color: #c3bbc7;
+	--shadow: 0 2px 6px rgba(78, 70, 89, 0.1);
+
+	/* Sidebar colors */
+	--sidebar-bg: #c3bbc7;
+	--sidebar-hover: #b8afc3;
+
+	/* Button hover */
+	--hover-bg: #565ab0;
+
+	/* Input colors */
+	--input-border: #c3bbc7;
+}
+
+/* Base styles */
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	background: var(--bg-primary);
+	font-size: 16px;
+	color: var(--text-primary);
+	transition: background 0.3s, color 0.3s;
+	display: flex;
+}
+
+/* Common input styles */
+input,
+select,
+textarea {
+	background: var(--bg-secondary);
+	color: var(--text-primary);
+	border: 1px solid var(--input-border);
+}
+
+label {
+	color: var(--text-primary);
+}
+
+/* Main content layout */
+.main-content {
+	margin-left: 240px;
+	width: calc(100% - 240px);
+	padding: 20px;
+}
+
+h1 {
+	color: var(--text-primary);
+	font-size: 32px;
+	margin-bottom: 20px;
+}
+
+/* Common UI Icons */
+.ui-icon {
+	width: 24px;
+	height: 24px;
+	filter: invert(1);
+	/* Nếu icon gốc là màu đen, invert để thành màu trắng trên nền tối */
+}
+
+/* Button Components */
+.btn {
+	border: none;
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	text-decoration: none;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+	transform: scale(0.98);
+}
+
+.btn-primary {
+	background-color: var(--color-accent);
+	color: var(--color-text-dark);
+}
+
+.btn-primary:hover {
+	background-color: #e0c590;
+	box-shadow: 0 4px 12px rgba(216, 184, 124, 0.4);
+}
+
+.btn-secondary {
+	background-color: var(--color-brand);
+	color: #ffffff;
+}
+
+.btn-secondary:hover {
+	background-color: #565ab0;
+	box-shadow: 0 4px 12px rgba(100, 105, 204, 0.4);
+}
+
+.btn-ghost {
+	background-color: transparent;
+	border: 2px solid var(--color-text-dark);
+	color: var(--color-text-dark);
+	box-shadow: none;
+}
+
+.btn-ghost:hover {
+	background-color: var(--color-text-dark);
+	color: var(--bg-primary);
+}

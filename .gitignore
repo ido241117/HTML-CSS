@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Frontend-next (excluded from this repo)
+frontend-next/
+
+# Backend: data & JSON files
+backend/*.json
+!backend/package.json
+!backend/package-lock.json
+backend/youtube-collections/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.env
+*.env

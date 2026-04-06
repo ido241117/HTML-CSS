@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Calendar - Project M</title>
+	<link rel="stylesheet" href="common.css">
+	<style>
+		/* Page-specific styles */
+		/* Add event section */
+		.add-section {
+			background: var(--bg-secondary);
+			padding: 20px;
+			border-radius: 12px;
+			margin-bottom: 30px;
+			border: 1px solid var(--border-color);
+		}
+
+		.add-section h2 {
+			color: var(--text-primary);
+			font-size: 20px;
+			margin-bottom: 15px;
+		}
+
+		.form-row {
+			display: flex;
+			gap: 10px;
+			margin-bottom: 10px;
+			flex-wrap: wrap;
+		}
+
+		.form-row input,
+		.form-row textarea {
+			flex: 1;
+			min-width: 200px;
+			padding: 10px;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			font-size: 14px;
+			font-family: Arial, sans-serif;
+		}
+
+		.form-row textarea {
+			min-height: 60px;
+			resize: vertical;
+		}
+
+		.form-row button {
+			padding: 10px 20px;
+			background: #28a745;
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: bold;
+		}
+
+		.form-row button:hover {
+			background: #218838;
+		}
+
+		.recurring-checkbox {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px;
+			background: var(--bg-secondary);
+			border-radius: 6px;
+			border: 1px solid var(--border-color);
+		}
+
+		.recurring-checkbox input[type="checkbox"] {
+			width: 18px;
+			height: 18px;
+			cursor: pointer;
+		}
+
+		.recurring-checkbox label {
+			color: var(--text-primary);
+			font-size: 14px;
+			cursor: pointer;
+			margin: 0;
+			user-select: none;
+		}
+
+		/* Calendar controls */
+		.calendar-controls {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+			background: var(--bg-secondary);
+			padding: 15px;
+			border-radius: 12px;
+			border: 1px solid var(--border-color);
+		}
+
+		.calendar-controls h2 {
+			margin: 0;
+			color: var(--text-primary);
+			font-size: 24px;
+		}
+
+		.calendar-controls .nav-buttons {
+			display: flex;
+			gap: 10px;
+		}
+
+		.calendar-controls button {
+			padding: 8px 16px;
+			background: #007acc;
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: bold;
+		}
+
+		.calendar-controls button:hover {
+			background: #005a9e;
+		}
+
+		.btn-today {
+			background: #28a745 !important;
+		}
+
+		.btn-today:hover {
+			background: #218838 !important;
+		}
+
+		/* Calendar grid */
+		.calendar-grid {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 1px;
+			background: var(--border-color);
+			border: 1px solid var(--border-color);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+
+		/* Calendar header (days of week) */
+		.calendar-header {
+			background: #007acc;
+			color: #fff;
+			padding: 12px;
+			text-align: center;
+			font-weight: bold;
+			font-size: 14px;
+		}
+
+		/* Calendar day cell */
+		.calendar-day {
+			background: var(--bg-secondary);
+			padding: 8px;
+			min-height: 120px;
+			position: relative;
+			cursor: pointer;
+			transition: background 0.2s;
+		}
+
+		.calendar-day:hover {
+			background: var(--bg-primary);
+		}
+
+		.calendar-day.other-month {
+			opacity: 0.3;
+		}
+
+		.calendar-day.today {
+			background: #000000;
+			border: 2px solid #007acc;
+		}
+
+		.day-number {
+			font-weight: bold;
+			color: var(--text-primary);
+			margin-bottom: 5px;
+			font-size: 14px;
+		}
+
+		/* Event dots in calendar */
+		.event-dots {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 3px;
+			margin-top: 5px;
+		}
+
+		.event-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: #007acc;
+		}
+
+		/* Events list */
+		.events-section {
+			margin-top: 30px;
+		}
+
+		.events-section h2 {
+			color: var(--text-primary);
+			font-size: 20px;
+			margin-bottom: 0;
+		}
+
+		.events-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 15px;
+		}
+
+		.filter-select {
+			padding: 8px 12px;
+			border-radius: 6px;
+			border: 1px solid var(--border-color);
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			font-size: 14px;
+			cursor: pointer;
+		}
+
+		.events-list {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.event-card {
+			background: var(--bg-secondary);
+			padding: 15px;
+			border-radius: 8px;
+			border-left: 4px solid #007acc;
+			transition: all 0.2s;
+		}
+
+		.event-card:hover {
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			transform: translateX(5px);
+		}
+
+		.event-card.passed {
+			opacity: 0.6;
+			border-left-color: #6c757d;
+		}
+
+		.event-title {
+			font-weight: bold;
+			color: var(--text-primary);
+			margin-bottom: 5px;
+			font-size: 16px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.event-recurring-badge {
+			background: #9b59b6;
+			color: #fff;
+			padding: 2px 8px;
+			border-radius: 4px;
+			font-size: 11px;
+			font-weight: 500;
+		}
+
+		.event-date {
+			color: var(--text-secondary);
+			font-size: 14px;
+			margin-bottom: 5px;
+		}
+
+		.event-desc {
+			color: var(--text-secondary);
+			font-size: 13px;
+			line-height: 1.4;
+		}
+
+		.event-actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 10px;
+		}
+
+		.event-actions button {
+			padding: 4px 12px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 12px;
+		}
+
+		.btn-edit {
+			background: #3498db;
+			color: #fff;
+		}
+
+		.btn-edit:hover {
+			background: #2980b9;
+		}
+
+		.btn-delete {
+			background: #e74c3c;
+			color: #fff;
+		}
+
+		.btn-delete:hover {
+			background: #c0392b;
+		}
+
+		/* Modal */
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.7);
+			z-index: 1000;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.modal.show {
+			display: flex;
+		}
+
+		.modal-content {
+			background: var(--bg-secondary);
+			padding: 24px;
+			border-radius: 12px;
+			max-width: 500px;
+			width: 90%;
+			border: 1px solid var(--border-color);
+		}
+
+		.modal-content h3 {
+			color: var(--text-primary);
+			margin-bottom: 20px;
+			font-size: 22px;
+		}
+
+		.modal-form {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+		}
+
+		.modal-form label {
+			color: var(--text-primary);
+			font-weight: 500;
+			font-size: 14px;
+			margin-bottom: 5px;
+		}
+
+		.modal-form input,
+		.modal-form textarea {
+			padding: 10px;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			background: var(--bg-primary);
+			color: var(--text-primary);
+			font-size: 14px;
+			font-family: Arial, sans-serif;
+		}
+
+		.modal-form textarea {
+			min-height: 80px;
+			resize: vertical;
+		}
+
+		.modal-buttons {
+			display: flex;
+			gap: 10px;
+			margin-top: 10px;
+		}
+
+		.modal-buttons button {
+			flex: 1;
+			padding: 12px;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: bold;
+			font-size: 14px;
+		}
+
+		.btn-save {
+			background: #28a745;
+			color: #fff;
+		}
+
+		.btn-save:hover {
+			background: #218838;
+		}
+
+		.btn-cancel {
+			background: #6c757d;
+			color: #fff;
+		}
+
+		.btn-cancel:hover {
+			background: #5a6268;
+		}
+
+		/* No events placeholder */
+		.no-events {
+			text-align: center;
+			padding: 40px;
+			color: var(--text-secondary);
+			font-style: italic;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Sidebar được load từ sidebar.js -->
+
+	<!-- Main Content -->
+	<div class="main-content">
+		<h1>📅 Calendar - Sự Kiện</h1>
+
+		<div class="add-section">
+			<h2>➕ Thêm Sự Kiện Mới</h2>
+			<div class="form-row">
+				<input id="eventTitle" type="text" placeholder="Tên sự kiện">
+				<input id="eventDate" type="date" placeholder="Chọn ngày">
+				<button onclick="addEvent()">➕ Thêm Sự Kiện</button>
+			</div>
+			<div class="form-row">
+				<textarea id="eventDesc" placeholder="Mô tả (tùy chọn)"></textarea>
+			</div>
+		</div>
+
+		<!-- Calendar controls -->
+		<div class="calendar-controls">
+			<button onclick="previousMonth()">◀ Tháng trước</button>
+			<h2 id="currentMonth"></h2>
+			<div class="nav-buttons">
+				<button class="btn-today" onclick="goToToday()">Hôm nay</button>
+				<button onclick="nextMonth()">Tháng sau ▶</button>
+			</div>
+		</div>
+
+		<!-- Calendar grid -->
+		<div class="calendar-grid" id="calendarGrid"></div>
+
+		<!-- Events list for current month -->
+		<div class="events-section">
+			<div class="events-header">
+				<h2 id="eventsListTitle">🎉 Sự Kiện Tháng Này</h2>
+				<select id="eventFilter" class="filter-select" onchange="renderEventsList()">
+					<option value="month">Tháng này</option>
+					<option value="week">Tuần này</option>
+					<option value="next_week">Tuần sau</option>
+					<option value="today">Hôm nay</option>
+				</select>
+			</div>
+			<div class="events-list" id="eventsList"></div>
+		</div>
+	</div>
+
+	<!-- Edit Event Modal -->
+	<div class="modal" id="editModal">
+		<div class="modal-content">
+			<h3>✏️ Chỉnh Sửa Sự Kiện</h3>
+			<div class="modal-form">
+				<label>Tên Sự Kiện</label>
+				<input id="editEventTitle" type="text">
+
+				<label>Ngày</label>
+				<input id="editEventDate" type="date">
+
+
+
+				<label>Mô Tả</label>
+				<textarea id="editEventDesc"></textarea>
+			</div>
+			<div class="modal-buttons">
+				<button class="btn-save" onclick="saveEditEvent()">💾 Lưu</button>
+				<button class="btn-cancel" onclick="closeEditModal()">❌ Hủy</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="sidebar.js"></script>
+	<script>
+		// Create sidebar when DOM loaded
+		document.addEventListener('DOMContentLoaded', () => createSidebar('calendar.html'));
+
+		// API_BASE tự động detect từ hostname hiện tại
+		const API_BASE = `http://${location.hostname}:3001`;
+
+		let events = [];
+		let currentDate = new Date();
+		let editingIndex = -1;
+
+		// Load events
+		async function loadEvents() {
+			try {
+				const res = await fetch(`${API_BASE}/api/events`);
+				events = await res.json();
+				renderCalendar();
+				renderEventsList();
+			} catch (err) {
+				console.error('Error loading events:', err);
+			}
+		}
+
+		// Render calendar
+		function renderCalendar() {
+			const year = currentDate.getFullYear();
+			const month = currentDate.getMonth();
+
+			// Update month title
+			const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+				'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+			document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+
+			// Get first day of month and number of days
+			const firstDay = new Date(year, month, 1).getDay();
+			const daysInMonth = new Date(year, month + 1, 0).getDate();
+			const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+			const grid = document.getElementById('calendarGrid');
+			grid.innerHTML = '';
+
+			// Add day headers
+			const dayNames = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+			dayNames.forEach(day => {
+				const header = document.createElement('div');
+				header.className = 'calendar-header';
+				header.textContent = day;
+				grid.appendChild(header);
+			});
+
+			// Add days from previous month
+			const startDay = firstDay === 0 ? 6 : firstDay - 1; // Monday as first day
+			for (let i = startDay - 1; i >= 0; i--) {
+				const day = daysInPrevMonth - i;
+				const cell = createDayCell(day, year, month - 1, true);
+				grid.appendChild(cell);
+			}
+
+			// Add days of current month
+			const today = new Date();
+			for (let day = 1; day <= daysInMonth; day++) {
+				const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+				const cell = createDayCell(day, year, month, false, isToday);
+				grid.appendChild(cell);
+			}
+
+			// Add days from next month
+			const totalCells = startDay + daysInMonth;
+			const remainingCells = 7 - (totalCells % 7);
+			if (remainingCells < 7) {
+				for (let day = 1; day <= remainingCells; day++) {
+					const cell = createDayCell(day, year, month + 1, true);
+					grid.appendChild(cell);
+				}
+			}
+		}
+
+		// Create day cell
+		function createDayCell(day, year, month, otherMonth = false, isToday = false) {
+			const cell = document.createElement('div');
+			cell.className = 'calendar-day';
+			if (otherMonth) cell.classList.add('other-month');
+			if (isToday) cell.classList.add('today');
+
+			// Create date string for comparison
+			const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+			const monthDay = `${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+			// Check for events on this day (exact date or recurring)
+			const dayEvents = events.filter(e => {
+				if (e.date === dateStr) return true; // Exact match
+				if (e.recurring && e.date.substring(5) === monthDay) return true; // Recurring match (month-day)
+				return false;
+			});
+
+			cell.innerHTML = `
+				<div class="day-number">${day}</div>
+				${dayEvents.length > 0 ? `<div class="event-dots">${'<div class="event-dot"></div>'.repeat(Math.min(dayEvents.length, 3))}</div>` : ''}
+			`;
+
+			// Click to add event on this day
+			if (!otherMonth) {
+				cell.onclick = () => quickAddEvent(dateStr);
+			}
+
+			return cell;
+		}
+
+		// Quick add event by clicking on day
+		function quickAddEvent(dateStr) {
+			document.getElementById('eventDate').value = dateStr;
+			document.getElementById('eventTitle').focus();
+		}
+
+		// Render events list
+		function renderEventsList() {
+			const filterType = document.getElementById('eventFilter').value;
+			const listTitle = document.getElementById('eventsListTitle');
+
+			let filteredEvents = [];
+			const now = new Date();
+			now.setHours(0, 0, 0, 0);
+
+			if (filterType === 'month') {
+				// Existing logic: View Month
+				listTitle.textContent = '🎉 Sự Kiện Tháng Này';
+				const year = currentDate.getFullYear();
+				const month = currentDate.getMonth();
+
+				filteredEvents = events.filter(e => {
+					const eventDate = new Date(e.date);
+					if (eventDate.getMonth() === month && eventDate.getFullYear() === year) return true;
+					if (e.recurring && eventDate.getMonth() === month) return true;
+					return false;
+				});
+			} else if (filterType === 'week') {
+				listTitle.textContent = '📅 Sự Kiện Tuần Này';
+				// Calculate start (Monday) and end (Sunday) of current week (Real Time)
+				const currentDay = now.getDay(); // 0 is Sunday
+				const diffToMon = currentDay === 0 ? -6 : 1 - currentDay;
+
+				const startOfWeek = new Date(now);
+				startOfWeek.setDate(now.getDate() + diffToMon);
+
+				const endOfWeek = new Date(startOfWeek);
+				endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+				filteredEvents = events.filter(e => {
+					// Check exact date
+					const eventDate = new Date(e.date);
+
+					// Handle recurring
+					let checkDate = new Date(e.date);
+					if (e.recurring) {
+						// For recurring, we construct a date in the current year
+						// But we need to be careful if the week crosses year boundary
+						// Simplification: Construct date for current year
+						checkDate.setFullYear(now.getFullYear());
+						// If week crosses year, we might need to check both years? 
+						// Let's assume standard use case for now or strict check.
+						// Better: Check if the recurring M-D falls within start/end range
+					}
+
+					// Normalize checkDate to midnight
+					checkDate.setHours(0, 0, 0, 0);
+
+					// However, for recurring, we really want to know if it happens this week.
+					// Let's iterate the 7 days of the week and check matches.
+					for (let d = 0; d < 7; d++) {
+						const weekDay = new Date(startOfWeek);
+						weekDay.setDate(startOfWeek.getDate() + d);
+
+						const weekDayStr = `${weekDay.getFullYear()}-${String(weekDay.getMonth() + 1).padStart(2, '0')}-${String(weekDay.getDate()).padStart(2, '0')}`;
+						const weekMonthDay = `${String(weekDay.getMonth() + 1).padStart(2, '0')}-${String(weekDay.getDate()).padStart(2, '0')}`;
+
+						if (e.date === weekDayStr) return true;
+						if (e.recurring && e.date.substring(5) === weekMonthDay) return true;
+					}
+					return false;
+				});
+
+			} else if (filterType === 'next_week') {
+				listTitle.textContent = '📅 Sự Kiện Tuần Sau';
+				// Calculate start (Monday) of This week
+				const currentDay = now.getDay(); // 0 is Sunday
+				const diffToMon = currentDay === 0 ? -6 : 1 - currentDay;
+
+				const startOfThisWeek = new Date(now);
+				startOfThisWeek.setDate(now.getDate() + diffToMon);
+
+				// Next week start = This week start + 7
+				const startOfNextWeek = new Date(startOfThisWeek);
+				startOfNextWeek.setDate(startOfThisWeek.getDate() + 7);
+
+				// Next week end = This week start + 13 (or Next week start + 6)
+				const endOfNextWeek = new Date(startOfNextWeek);
+				endOfNextWeek.setDate(startOfNextWeek.getDate() + 6);
+
+				filteredEvents = events.filter(e => {
+					// Check exact date
+					// Handle recurring
+					let checkDate = new Date(e.date);
+					if (e.recurring) {
+						checkDate.setFullYear(now.getFullYear());
+					}
+					checkDate.setHours(0, 0, 0, 0); // Normalize checkDate
+
+					// Iterate the 7 days of next week
+					for (let d = 0; d < 7; d++) {
+						const weekDay = new Date(startOfNextWeek);
+						weekDay.setDate(startOfNextWeek.getDate() + d);
+
+						const weekDayStr = `${weekDay.getFullYear()}-${String(weekDay.getMonth() + 1).padStart(2, '0')}-${String(weekDay.getDate()).padStart(2, '0')}`;
+						const weekMonthDay = `${String(weekDay.getMonth() + 1).padStart(2, '0')}-${String(weekDay.getDate()).padStart(2, '0')}`;
+
+						if (e.date === weekDayStr) return true;
+						if (e.recurring && e.date.substring(5) === weekMonthDay) return true;
+					}
+					return false;
+				});
+
+			} else if (filterType === 'today') {
+				listTitle.textContent = '🌟 Sự Kiện Hôm Nay';
+				const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+				const todayMonthDay = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+				filteredEvents = events.filter(e => {
+					if (e.date === todayStr) return true;
+					if (e.recurring && e.date.substring(5) === todayMonthDay) return true;
+					return false;
+				});
+			}
+
+			// Sort by date
+			// Note: For recurring events in Week view, we might want to sort by their occurrence in that week.
+			// Current sort uses 'e.date' which is the original date. This might be wrong for recurring events in "Week" view if they are old.
+			// Fix: Map to displayDate first?
+
+			// Let's just sort by original date for now to keep it simple, or improve:
+			const eventsWithDisplayDate = filteredEvents.map(e => {
+				let displayDate = e.date;
+				// If recurring, find the instance relevant to the filter
+				if (e.recurring) {
+					const nowYear = new Date().getFullYear();
+					const targetYear = (filterType === 'month') ? currentDate.getFullYear() : nowYear;
+					displayDate = `${targetYear}-${e.date.substring(5)}`;
+				}
+				return { ...e, displayDate, originalIndex: events.indexOf(e) };
+			});
+
+			eventsWithDisplayDate.sort((a, b) => new Date(a.displayDate) - new Date(b.displayDate));
+
+			const listDiv = document.getElementById('eventsList');
+			listDiv.innerHTML = '';
+
+			if (eventsWithDisplayDate.length === 0) {
+				let msg = 'tháng này';
+				if (filterType === 'week') msg = 'tuần này';
+				if (filterType === 'next_week') msg = 'tuần sau';
+				if (filterType === 'today') msg = 'hôm nay';
+				listDiv.innerHTML = `<div class="no-events">Không có sự kiện nào ${msg}</div>`;
+				return;
+			}
+
+			eventsWithDisplayDate.forEach((event) => {
+				const displayDate = event.displayDate;
+				const isPassed = new Date(displayDate) < now && (new Date(displayDate).getDate() !== now.getDate());
+
+				const card = document.createElement('div');
+				card.className = 'event-card';
+				if (isPassed) card.classList.add('passed');
+
+				card.innerHTML = `
+					<div class="event-title">
+						${event.title}
+						${event.recurring ? '<span class="event-recurring-badge">🔁 Hàng năm</span>' : ''}
+					</div>
+					<div class="event-date">📅 ${formatDate(displayDate)} - ${getDaysUntil(displayDate)}</div>
+					${event.description ? `<div class="event-desc">${event.description}</div>` : ''}
+					<div class="event-actions">
+						<button class="btn-edit" onclick="editEvent(${event.originalIndex})">✏️ Sửa</button>
+						<button class="btn-delete" onclick="deleteEvent(${event.originalIndex})">🗑️ Xóa</button>
+					</div>
+				`;
+
+				listDiv.appendChild(card);
+			});
+		}
+
+
+
+
+		// Format date
+		function formatDate(dateStr) {
+			const date = new Date(dateStr);
+			return date.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+		}
+
+		// Calculate days until event
+		function getDaysUntil(dateStr) {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			const eventDate = new Date(dateStr);
+			eventDate.setHours(0, 0, 0, 0);
+
+			const diffTime = eventDate - today;
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+			if (diffDays < 0) {
+				return `Đã qua ${Math.abs(diffDays)} ngày`;
+			} else if (diffDays === 0) {
+				return 'Hôm nay';
+			} else if (diffDays === 1) {
+				return 'Ngày mai';
+			} else {
+				return `Còn ${diffDays} ngày`;
+			}
+		}
+
+		// Add event
+		async function addEvent() {
+			const title = document.getElementById('eventTitle').value.trim();
+			const date = document.getElementById('eventDate').value;
+			const description = document.getElementById('eventDesc').value.trim();
+
+			if (!title || !date) {
+				alert('Vui lòng nhập tên sự kiện và chọn ngày!');
+				return;
+			}
+
+			events.push({
+				title: title,
+				date: date,
+				description: description
+			});
+
+			await saveEvents();
+
+			// Clear form
+			document.getElementById('eventTitle').value = '';
+			document.getElementById('eventDate').value = '';
+			document.getElementById('eventDesc').value = '';
+
+
+			renderCalendar();
+			renderEventsList();
+		}
+
+		// Edit event
+		function editEvent(index) {
+			editingIndex = index;
+			const event = events[index];
+
+			document.getElementById('editEventTitle').value = event.title;
+			document.getElementById('editEventDate').value = event.date;
+			document.getElementById('editEventDesc').value = event.description || '';
+
+
+			document.getElementById('editModal').classList.add('show');
+		}
+
+		// Save edited event
+		async function saveEditEvent() {
+			if (editingIndex === -1) return;
+
+			const title = document.getElementById('editEventTitle').value.trim();
+			const date = document.getElementById('editEventDate').value;
+			const description = document.getElementById('editEventDesc').value.trim();
+
+			if (!title || !date) {
+				alert('Vui lòng nhập tên sự kiện và chọn ngày!');
+				return;
+			}
+
+			events[editingIndex] = {
+				title: title,
+				date: date,
+				description: description
+			};
+
+			await saveEvents();
+			closeEditModal();
+			renderCalendar();
+			renderEventsList();
+		}
+
+		// Close edit modal
+		function closeEditModal() {
+			document.getElementById('editModal').classList.remove('show');
+			editingIndex = -1;
+		}
+
+		// Delete event
+		async function deleteEvent(index) {
+			if (!confirm('Bạn có chắc muốn xóa sự kiện này?')) return;
+
+			events.splice(index, 1);
+			await saveEvents();
+			renderCalendar();
+			renderEventsList();
+		}
+
+		// Save events to server
+		async function saveEvents() {
+			try {
+				await fetch(`${API_BASE}/api/events`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(events)
+				});
+			} catch (err) {
+				console.error('Error saving events:', err);
+				alert('Lỗi khi lưu sự kiện!');
+			}
+		}
+
+		// Navigate months
+		function previousMonth() {
+			currentDate.setMonth(currentDate.getMonth() - 1);
+			renderCalendar();
+			renderEventsList();
+		}
+
+		function nextMonth() {
+			currentDate.setMonth(currentDate.getMonth() + 1);
+			renderCalendar();
+			renderEventsList();
+		}
+
+		function goToToday() {
+			currentDate = new Date();
+			renderCalendar();
+			renderEventsList();
+		}
+
+		// Initialize
+		loadEvents();
+	</script>
+</body>
+
+</html>
